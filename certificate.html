@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificate - {{ result['quiz_title'] }}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Pinyon+Script&family=Poppins:wght@400;500;600&display=swap');
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #1e293b; font-family: 'Poppins', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+
+        /* Certificate Frame */
+        .cert-outer {
+            width: 900px;
+            background: #fff;
+            padding: 25px;
+            border: 12px solid #0f172a;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        .cert-inner {
+            border: 3px double #d97706;
+            padding: 40px;
+            text-align: center;
+            background: #fffdfa;
+            color: #1e293b;
+            position: relative;
+        }
+
+        /* Ribbon / Badge Header */
+        .brand-header {
+            font-family: 'Cinzel', serif;
+            font-size: 20px;
+            letter-spacing: 3px;
+            color: #0f172a;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .cert-title {
+            font-family: 'Cinzel', serif;
+            font-size: 38px;
+            font-weight: 800;
+            color: #b45309;
+            margin: 15px 0 5px 0;
+            letter-spacing: 2px;
+        }
+
+        .cert-subtitle {
+            font-size: 14px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 25px;
+        }
+
+        .recipient-name {
+            font-family: 'Pinyon Script', cursive;
+            font-size: 55px;
+            color: #0f172a;
+            margin: 10px 0;
+            border-bottom: 2px solid #cbd5e1;
+            display: inline-block;
+            padding: 0 40px;
+        }
+
+        .cert-text {
+            font-size: 15px;
+            color: #475569;
+            line-height: 1.6;
+            max-width: 650px;
+            margin: 15px auto;
+        }
+
+        .quiz-title {
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        /* Certificate Footer */
+        .cert-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 40px;
+            padding: 0 30px;
+        }
+
+        .meta-box { text-align: left; font-size: 13px; color: #64748b; }
+        .meta-box b { color: #0f172a; }
+
+        .seal-badge {
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle, #f59e0b, #b45309);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 32px;
+            box-shadow: 0 4px 10px rgba(180, 83, 9, 0.4);
+            border: 4px solid #fff;
+        }
+
+        .signature-box { text-align: center; }
+        .sign-line { width: 160px; border-top: 2px solid #0f172a; margin-top: 40px; }
+        .sign-title { font-size: 12px; font-weight: 600; color: #64748b; margin-top: 5px; }
+
+        /* Action Buttons */
+        .actions {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        .btn-print {
+            background: #16a34a;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .btn-back {
+            background: #475569;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* Print CSS for Clean PDF Output */
+        @media print {
+            body { background: white; padding: 0; }
+            .actions { display: none; }
+            .cert-outer { box-shadow: none; width: 100%; border-width: 8px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="actions">
+        <a href="/student/dashboard" class="btn-back"><i class="fa-solid fa-arrow-left"></i> Back</a>
+        <button onclick="window.print()" class="btn-print"><i class="fa-solid fa-file-pdf"></i> Save / Print PDF</button>
+    </div>
+
+    <div class="cert-outer">
+        <div class="cert-inner">
+            <div class="brand-header"><i class="fa-solid fa-graduation-cap"></i> QuizOps Academy</div>
+            <h1 class="cert-title">CERTIFICATE OF ACHIEVEMENT</h1>
+            <p class="cert-subtitle">PROUDLY PRESENTED TO</p>
+
+            <div class="recipient-name">{{ result['username'] }}</div>
+
+            <p class="cert-text">
+                For successfully passing the online assessment test for 
+                <b class="quiz-title">{{ result['quiz_title'] }}</b> (Subject: <b>{{ result['subject'] }}</b>)
+                with an outstanding score of <b>{{ result['percentage'] }}%</b>.
+            </p>
+
+            <div class="cert-footer">
+                <div class="meta-box">
+                    <p>Score: <b>{{ result['score'] }}/{{ result['total_questions'] }}</b></p>
+                    <p>Issue Date: <b>{{ result['date_taken'] if result['date_taken'] else '15 Aug 2026' }}</b></p>
+                    <p>Status: <b style="color: #16a34a;">VERIFIED</b></p>
+                </div>
+
+                <div class="seal-badge">
+                    <i class="fa-solid fa-award"></i>
+                </div>
+
+                <div class="signature-box">
+                    <div class="sign-line"></div>
+                    <div class="sign-title">Authorized Examiner</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

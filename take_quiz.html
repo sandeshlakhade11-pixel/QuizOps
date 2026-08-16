@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Take Quiz - {{ quiz.title }}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+        }
+        .container { max-width: 800px; margin: 0 auto; }
+        
+        /* Fixed Header with Live Timer */
+        .quiz-header {
+            position: sticky;
+            top: 10px;
+            z-index: 100;
+            background: #1e293b;
+            border: 1px solid #38bdf8;
+            padding: 15px 25px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            margin-bottom: 25px;
+        }
+        .quiz-title { font-size: 18px; font-weight: 700; color: #f8fafc; }
+        .timer-box {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+            border: 1px solid #ef4444;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .question-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 22px;
+            margin-bottom: 20px;
+        }
+        .q-number { font-size: 13px; color: #38bdf8; font-weight: 700; margin-bottom: 6px; }
+        .q-text { font-size: 16px; font-weight: 600; margin-bottom: 15px; }
+
+        .options-list { display: flex; flex-direction: column; gap: 10px; }
+        .option-item {
+            display: flex;
+            align-items: center;
+            background: #0f172a;
+            border: 1px solid #334155;
+            padding: 12px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .option-item:hover { border-color: #38bdf8; }
+        .option-item input { margin-right: 12px; width: 18px; height: 18px; accent-color: #38bdf8; cursor: pointer; }
+        
+        .btn-submit {
+            width: 100%;
+            padding: 15px;
+            background: #16a34a;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .btn-submit:hover { background: #15803d; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Live Countdown Timer Bar -->
+        <div class="quiz-header">
+            <div class="quiz-title">
+                <i class="fa-solid fa-file-signature"></i> {{ quiz.title }} ({{ quiz.subject }})
+            </div>
+            <div class="timer-box">
+                <i class="fa-solid fa-hourglass-half"></i> <span id="timer">--:--</span>
+            </div>
+        </div>
+
+        <form id="quizForm" method="POST" action="/submit_quiz/{{ quiz.id }}">
+            {% for q in questions %}
+            <div class="question-card">
+                <div class="q-number">QUESTION {{ loop.index }} OF {{ questions|length }}</div>
+                <div class="q-text">{{ q.question_text }}</div>
+
+                <div class="options-list">
+                    <label class="option-item">
+                        <input type="radio" name="question_{{ q.id }}" value="A">
+                        <span><b>A.</b> {{ q.option_a }}</span>
+                    </label>
+                    <label class="option-item">
+                        <input type="radio" name="question_{{ q.id }}" value="B">
+                        <span><b>B.</b> {{ q.option_b }}</span>
+                    </label>
+                    <label class="option-item">
+                        <input type="radio" name="question_{{ q.id }}" value="C">
+                        <span><b>C.</b> {{ q.option_c }}</span>
+                    </label>
+                    <label class="option-item">
+                        <input type="radio" name="question_{{ q.id }}" value="D">
+                        <span><b>D.</b> {{ q.option_d }}</span>
+                    </label>
+                </div>
+            </div>
+            {% endfor %}
+
+            <button type="submit" class="btn-submit" onclick="return confirm('Are you sure you want to submit your test?')">
+                <i class="fa-solid fa-paper-plane"></i> Submit Test Now
+            </button>
+        </form>
+    </div>
+
+    <!-- Countdown Timer Logic -->
+    <script>
+        let durationMinutes = parseInt("{{ quiz.duration }}") || 10;
+        let totalSeconds = durationMinutes * 60;
+        const timerElement = document.getElementById('timer');
+        const form = document.getElementById('quizForm');
+
+        const countdown = setInterval(() => {
+            let minutes = Math.floor(totalSeconds / 60);
+            let seconds = totalSeconds % 60;
+
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+            seconds = seconds < 10 ? '0' + seconds : seconds;
+
+            timerElement.textContent = `${minutes}:${seconds}`;
+
+            if (totalSeconds <= 0) {
+                clearInterval(countdown);
+                alert("Time is UP! Your answers are being submitted automatically.");
+                form.submit();
+            }
+            totalSeconds--;
+        }, 1000);
+    </script>
+
+</body>
+</html>

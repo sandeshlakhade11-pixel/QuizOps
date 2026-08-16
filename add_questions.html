@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Questions - QuizOps</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .btn-back {
+            color: #38bdf8;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #38bdf8;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 10px;
+        }
+        
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 13px; color: #cbd5e1; margin-bottom: 6px; font-weight: 600; }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            color: #f8fafc;
+            font-size: 14px;
+            outline: none;
+        }
+        .grid-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .btn-save {
+            width: 100%;
+            padding: 12px;
+            background: #16a34a;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 15px;
+            margin-top: 10px;
+        }
+        .btn-save:hover { background: #15803d; }
+
+        .q-list-item {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 12px;
+        }
+        .opt-tag {
+            display: inline-block;
+            background: #1e293b;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-right: 8px;
+            margin-top: 6px;
+            color: #94a3b8;
+        }
+        .opt-correct { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid #22c55e; }
+
+        .alert {
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            background: rgba(34, 197, 94, 0.15);
+            border: 1px solid #22c55e;
+            color: #86efac;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h2>Add Questions to: <span style="color: #38bdf8;">{{ quiz.title }}</span></h2>
+            <a href="/teacher/dashboard" class="btn-back"><i class="fa-solid fa-arrow-left"></i> Back to Dashboard</a>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert"><i class="fa-solid fa-check-circle"></i> {{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Form: Add Question -->
+        <div class="card">
+            <div class="card-title"><i class="fa-solid fa-plus-circle"></i> Add New MCQ Question</div>
+            <form method="POST">
+                <div class="form-group">
+                    <label>Question Text</label>
+                    <input type="text" name="question_text" placeholder="e.g. What is the output of print(2 ** 3) in Python?" required>
+                </div>
+
+                <div class="grid-options">
+                    <div class="form-group">
+                        <label>Option A</label>
+                        <input type="text" name="option_a" placeholder="Option A" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Option B</label>
+                        <input type="text" name="option_b" placeholder="Option B" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Option C</label>
+                        <input type="text" name="option_c" placeholder="Option C" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Option D</label>
+                        <input type="text" name="option_d" placeholder="Option D" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Correct Answer Option</label>
+                    <select name="correct_option" required>
+                        <option value="">Select Correct Option</option>
+                        <option value="A">Option A</option>
+                        <option value="B">Option B</option>
+                        <option value="C">Option C</option>
+                        <option value="D">Option D</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-save">
+                    <i class="fa-solid fa-floppy-disk"></i> Save Question
+                </button>
+            </form>
+        </div>
+
+        <!-- Questions Saved List -->
+        <div class="card">
+            <div class="card-title">
+                <i class="fa-solid fa-list-ol"></i> Questions Added So Far ({{ questions|length }})
+            </div>
+            
+            {% for q in questions %}
+            <div class="q-list-item">
+                <p><b>Q{{ loop.index }}: {{ q.question_text }}</b></p>
+                <div>
+                    <span class="opt-tag {% if q.correct_option == 'A' %}opt-correct{% endif %}">A: {{ q.option_a }}</span>
+                    <span class="opt-tag {% if q.correct_option == 'B' %}opt-correct{% endif %}">B: {{ q.option_b }}</span>
+                    <span class="opt-tag {% if q.correct_option == 'C' %}opt-correct{% endif %}">C: {{ q.option_c }}</span>
+                    <span class="opt-tag {% if q.correct_option == 'D' %}opt-correct{% endif %}">D: {{ q.option_d }}</span>
+                </div>
+            </div>
+            {% else %}
+                <p style="color: #94a3b8; text-align: center;">No questions added yet to this quiz.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+</body>
+</html>
