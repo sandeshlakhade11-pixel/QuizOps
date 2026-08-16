@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuizOps - Student Dashboard</title>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Main Style CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        /* Container and Navbar Layout Adjustments */
+        .container { max-width: 1100px; margin: 0 auto; padding: 20px 10px; }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-card, #1e293b);
+            padding: 18px 25px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color, #334155);
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--accent-blue, #38bdf8);
+        }
+        .user-info { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
+        .badge-student {
+            background: rgba(56, 189, 248, 0.2);
+            color: var(--accent-blue, #38bdf8);
+            border: 1px solid var(--accent-blue, #38bdf8);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .btn-logout {
+            color: #f8fafc;
+            background: #ef4444;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+        .btn-logout:hover { background: #dc2626; }
+
+        .card {
+            background: var(--bg-card, #1e293b);
+            border: 1px solid var(--border-color, #334155);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--accent-blue, #38bdf8);
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color, #334155);
+            padding-bottom: 12px;
+        }
+
+        .btn-start {
+            background: #16a34a;
+            color: #fff;
+            padding: 8px 14px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-start:hover { background: #15803d; }
+
+        .btn-cert {
+            background: #0284c7;
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-cert:hover { background: #0369a1; }
+
+        .status-passed { color: #4ade80; font-weight: 700; }
+        .status-failed { color: #f87171; font-weight: 700; }
+
+        /* Mobile Adjustments */
+        @media (max-width: 600px) {
+            .navbar { flex-direction: column; align-items: flex-start; }
+            .user-info { width: 100%; justify-content: space-between; }
+            .card { padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Navbar -->
+        <div class="navbar">
+            <div class="brand">
+                <i class="fa-solid fa-graduation-cap"></i> QuizOps Student Portal
+            </div>
+            <div class="user-info">
+                <span class="badge-student"><i class="fa-solid fa-user-graduate"></i> {{ session['username'] }}</span>
+                <a href="/logout" class="btn-logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+            </div>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <span>{{ message }}</span>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Available Quizzes -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fa-solid fa-pen-to-square"></i> Available Quizzes for You
+            </div>
+            
+            <!-- Table Responsive Wrapper -->
+            <div class="table-wrapper">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Quiz Title</th>
+                            <th>Subject</th>
+                            <th>Teacher</th>
+                            <th>Duration</th>
+                            <th>Passing Limit</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for q in quizzes %}
+                        <tr>
+                            <td><b>{{ q['title'] }}</b></td>
+                            <td>{{ q['subject'] }}</td>
+                            <td><i class="fa-solid fa-chalkboard-user"></i> {{ q['teacher_name'] if q['teacher_name'] else 'Admin' }}</td>
+                            <td><i class="fa-regular fa-clock"></i> {{ q['duration'] }} Mins</td>
+                            <td><b>{{ q['pass_percentage'] }}%</b></td>
+                            <td>
+                                <a href="/take_quiz/{{ q['id'] }}" class="btn-start">
+                                    <i class="fa-solid fa-play"></i> Start Test
+                                </a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="6" style="text-align: center; color: #94a3b8;">No quizzes available right now.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- My Exam Results & Download Certificate -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fa-solid fa-trophy"></i> My Exam History & Certificates
+            </div>
+
+            <!-- Table Responsive Wrapper -->
+            <div class="table-wrapper">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Quiz Title</th>
+                            <th>Subject</th>
+                            <th>Score</th>
+                            <th>Percentage</th>
+                            <th>Status</th>
+                            <th>Date Taken</th>
+                            <th>Certificate</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in results %}
+                        <tr>
+                            <td><b>{{ r['quiz_title'] }}</b></td>
+                            <td>{{ r['subject'] }}</td>
+                            <td>{{ r['score'] }}/{{ r['total_questions'] }}</td>
+                            <td><b>{{ r['percentage'] }}%</b></td>
+                            <td>
+                                <span class="{% if r['status'] == 'Passed' %}status-passed{% else %}status-failed{% endif %}">
+                                    {{ r['status'] }}
+                                </span>
+                            </td>
+                            <td>{{ r['date_taken'] if r['date_taken'] else 'N/A' }}</td>
+                            <td>
+                                {% if r['status'] == 'Passed' %}
+                                    <a href="/download_certificate/{{ r['id'] }}" class="btn-cert">
+                                        <i class="fa-solid fa-file-arrow-down"></i> Download PDF
+                                    </a>
+                                {% else %}
+                                    <span style="font-size: 12px; color: #64748b;">Not Eligible</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="7" style="text-align: center; color: #94a3b8;">You haven't taken any tests yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
