@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Login - QuizOps</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -15,17 +15,18 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            padding: 15px;
         }
         .login-card {
             background: #1e293b;
             border: 1px solid #334155;
             border-radius: 16px;
-            padding: 40px;
+            padding: 30px 20px;
             width: 100%;
             max-width: 400px;
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
         }
-        .header { text-align: center; margin-bottom: 30px; }
+        .header { text-align: center; margin-bottom: 25px; }
         .header i { font-size: 45px; color: #38bdf8; margin-bottom: 10px; }
         .header h1 { font-size: 24px; font-weight: 700; }
         
@@ -42,7 +43,7 @@
             display: flex;
             align-items: center;
         }
-        .input-wrapper input, .input-wrapper select {
+        .input-wrapper input {
             width: 100%;
             padding: 12px 14px;
             background: #0f172a;
@@ -52,7 +53,7 @@
             font-size: 14px;
             outline: none;
         }
-        .input-wrapper input:focus, .input-wrapper select:focus { border-color: #38bdf8; }
+        .input-wrapper input:focus { border-color: #38bdf8; }
         
         .toggle-password {
             position: absolute;
@@ -127,18 +128,6 @@
                 <div class="input-wrapper">
                     <input type="password" id="password" style="padding-right: 40px;" name="password" placeholder="Enter password" required>
                     <i class="fa-solid fa-eye toggle-password" id="toggleEye" onclick="togglePasswordVisibility()"></i>
-                </div>
-            </div>
-
-            <!-- Select Role Dropdown -->
-            <div class="form-group">
-                <label>Select Role</label>
-                <div class="input-wrapper">
-                    <select name="role" required>
-                        <option value="Student">Student</option>
-                        <option value="Teacher">Teacher</option>
-                        <option value="Admin">Admin</option>
-                    </select>
                 </div>
             </div>
 
