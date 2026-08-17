@@ -1,18 +1,22 @@
-from datetime import datetime
-from flask import Flask, render_template, request, redirect, url_for, session, flash, send_file
-from werkzeug.security import generate_password_hash, check_password_hash
+import os
+import sqlite3
 from datetime import datetime
 from io import BytesIO
-import sqlite3
+from flask import Flask, render_template, request, redirect, url_for, session, flash, send_file
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 app.secret_key = 'quizops_secret_key_123'
+
+# Absolute path for Render deployment
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(BASE_DIR, 'quizops.db')
 
 # ------------------------------------
 # DATABASE CONNECTION & INITIALIZATION
 # ------------------------------------
 def get_db_connection():
-    conn = sqlite3.connect('quizops.db')
+    conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -84,7 +88,6 @@ def init_db():
             'INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)',
             ('admin', 'admin@quizops.com', hashed_pw, 'Admin')
         )
-        print("Default Admin Account Created -> Username: admin | Password: admin123")
 
     conn.commit()
     conn.close()
@@ -99,35 +102,36 @@ def home():
     if 'user_id' in session:
         role = session.get('role')
         if role == 'Admin':
-            return redirect('/admin/dashboard')
+            return redirect(url_for('admin_dashboard'))
         elif role == 'Teacher':
-            return redirect('/teacher/dashboard')
+            return redirect(url_for('teacher_dashboard'))
         else:
-            return redirect('/student/dashboard')
-    return redirect('/login')
+            return redirect(url_for('student_dashboard'))
+    return redirect(url_for('login'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
+        username = request.form['username'].strip()
+        password = request.form['password'].strip()
         
         conn = get_db_connection()
         user = conn.execute('SELECT * FROM users WHERE username = ? OR email = ?', (username, username)).fetchone()
         conn.close()
         
         if user and check_password_hash(user['password'], password):
+            session.permanent = True
             session['user_id'] = user['id']
             session['username'] = user['username']
             session['role'] = user['role']
             
             flash('Login Successful!', 'success')
             if user['role'] == 'Admin':
-                return redirect('/admin/dashboard')
+                return redirect(url_for('admin_dashboard'))
             elif user['role'] == 'Teacher':
-                return redirect('/teacher/dashboard')
+                return redirect(url_for('teacher_dashboard'))
             else:
-                return redirect('/student/dashboard')
+                return redirect(url_for('student_dashboard'))
         else:
             flash('Invalid Username/Email or Password!', 'danger')
             
@@ -136,9 +140,9 @@ def login():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        username = request.form['username']
-        email = request.form['email']
-        password = request.form['password']
+        username = request.form['username'].strip()
+        email = request.form['email'].strip()
+        password = request.form['password'].strip()
         role = request.form.get('role', 'Student')
         
         hashed_password = generate_password_hash(password)
@@ -149,7 +153,7 @@ def register():
                          (username, email, hashed_password, role))
             conn.commit()
             flash('Registration successful! Please login.', 'success')
-            return redirect('/login')
+            return redirect(url_for('login'))
         except sqlite3.IntegrityError:
             flash('Username or Email already exists!', 'danger')
         finally:
@@ -161,7 +165,7 @@ def register():
 def logout():
     session.clear()
     flash('Logged out successfully.', 'info')
-    return redirect('/login')
+    return redirect(url_for('login'))
 
 # ------------------------------------
 # ADMIN ROUTES
@@ -169,7 +173,7 @@ def logout():
 @app.route('/admin/dashboard')
 def admin_dashboard():
     if session.get('role') != 'Admin':
-        return redirect('/login')
+        return redirect(url_for('login'))
     
     conn = get_db_connection()
     users = conn.execute('SELECT * FROM users').fetchall()
@@ -180,11 +184,11 @@ def admin_dashboard():
 @app.route('/admin/add_user', methods=['POST'])
 def add_user():
     if session.get('role') != 'Admin':
-        return redirect('/login')
+        return redirect(url_for('login'))
         
-    username = request.form['username']
-    email = request.form['email']
-    password = request.form['password']
+    username = request.form['username'].strip()
+    email = request.form['email'].strip()
+    password = request.form['password'].strip()
     role = request.form['role']
     
     hashed_password = generate_password_hash(password)
@@ -200,17 +204,17 @@ def add_user():
     finally:
         conn.close()
         
-    return redirect('/admin/dashboard')
+    return redirect(url_for('admin_dashboard'))
 
 @app.route('/edit_user/<int:user_id>', methods=['GET', 'POST'])
 def edit_user(user_id):
     if session.get('role') != 'Admin':
-        return redirect('/login')
+        return redirect(url_for('login'))
         
     conn = get_db_connection()
     if request.method == 'POST':
-        username = request.form['username']
-        email = request.form['email']
+        username = request.form['username'].strip()
+        email = request.form['email'].strip()
         role = request.form['role']
         
         conn.execute('UPDATE users SET username = ?, email = ?, role = ? WHERE id = ?',
@@ -218,7 +222,7 @@ def edit_user(user_id):
         conn.commit()
         conn.close()
         flash('User updated successfully!', 'success')
-        return redirect('/admin/dashboard')
+        return redirect(url_for('admin_dashboard'))
         
     user = conn.execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()
     conn.close()
@@ -227,14 +231,14 @@ def edit_user(user_id):
 @app.route('/delete_user/<int:user_id>')
 def delete_user(user_id):
     if session.get('role') != 'Admin':
-        return redirect('/login')
+        return redirect(url_for('login'))
         
     conn = get_db_connection()
     conn.execute('DELETE FROM users WHERE id = ?', (user_id,))
     conn.commit()
     conn.close()
     flash('User deleted successfully!', 'info')
-    return redirect('/admin/dashboard')
+    return redirect(url_for('admin_dashboard'))
 
 # ------------------------------------
 # TEACHER ROUTES
@@ -242,7 +246,7 @@ def delete_user(user_id):
 @app.route('/teacher/dashboard')
 def teacher_dashboard():
     if session.get('role') != 'Teacher':
-        return redirect('/login')
+        return redirect(url_for('login'))
     
     conn = get_db_connection()
     quizzes = conn.execute('SELECT * FROM quizzes WHERE created_by = ?', (session['user_id'],)).fetchall()
@@ -252,7 +256,7 @@ def teacher_dashboard():
 @app.route('/create_quiz', methods=['GET', 'POST'])
 def create_quiz():
     if session.get('role') not in ['Teacher', 'Admin']:
-        return redirect('/login')
+        return redirect(url_for('login'))
     
     if request.method == 'POST':
         title = request.form.get('title')
@@ -278,7 +282,7 @@ def create_quiz():
 @app.route('/add_questions/<int:quiz_id>', methods=['GET', 'POST'])
 def add_questions(quiz_id):
     if session.get('role') not in ['Teacher', 'Admin']:
-        return redirect('/login')
+        return redirect(url_for('login'))
         
     conn = get_db_connection()
     if request.method == 'POST':
@@ -304,26 +308,19 @@ def add_questions(quiz_id):
 # ------------------------------------
 # STUDENT ROUTES
 # ------------------------------------
-# --- STUDENT DASHBOARD ---
-from io import BytesIO
-from flask import send_file, render_template, session, redirect, flash
-
-# --- STUDENT DASHBOARD ROUTE ---
 @app.route('/student/dashboard')
 def student_dashboard():
     if session.get('role') != 'Student':
-        return redirect('/login')
+        return redirect(url_for('login'))
         
     conn = get_db_connection()
     
-    # 1. Quizzes List (with Teacher Name)
     quizzes = conn.execute('''
         SELECT q.*, u.username AS teacher_name 
         FROM quizzes q
         LEFT JOIN users u ON q.created_by = u.id
     ''').fetchall()
     
-    # 2. Results History (with Quiz Title, Subject & Date)
     results = conn.execute('''
         SELECT r.*, q.title AS quiz_title, q.subject
         FROM results r
@@ -334,11 +331,10 @@ def student_dashboard():
     conn.close()
     return render_template('student_dashboard.html', quizzes=quizzes, results=results)
 
-
 @app.route('/download_certificate/<int:result_id>')
 def download_certificate(result_id):
     if 'user_id' not in session:
-        return redirect('/login')
+        return redirect(url_for('login'))
         
     conn = get_db_connection()
     result = conn.execute('''
@@ -352,15 +348,14 @@ def download_certificate(result_id):
 
     if not result:
         flash('Result record not found!', 'danger')
-        return redirect('/student/dashboard')
+        return redirect(url_for('student_dashboard'))
 
-    # आता क्लासिक HTML सर्टिफिकेट पेज ओपन होईल
     return render_template('certificate.html', result=result)
 
 @app.route('/take_quiz/<int:quiz_id>')
 def take_quiz(quiz_id):
     if session.get('role') != 'Student':
-        return redirect('/login')
+        return redirect(url_for('login'))
         
     conn = get_db_connection()
     quiz = conn.execute('SELECT * FROM quizzes WHERE id = ?', (quiz_id,)).fetchone()
@@ -369,45 +364,51 @@ def take_quiz(quiz_id):
     
     return render_template('take_quiz.html', quiz=quiz, questions=questions)
 
-from datetime import datetime
-
 @app.route('/submit_quiz/<int:quiz_id>', methods=['POST'])
 def submit_quiz(quiz_id):
-    if 'user_id' not in session:
-        return redirect('/login')
+    if session.get('role') != 'Student' or 'user_id' not in session:
+        return redirect(url_for('login'))
         
-    conn = get_db_connection()
-    questions = conn.execute('SELECT * FROM questions WHERE quiz_id = ?', (quiz_id,)).fetchall()
-    quiz = conn.execute('SELECT * FROM quizzes WHERE id = ?', (quiz_id,)).fetchone()
+    student_id = session['user_id']
     
+    conn = get_db_connection()
+    quiz = conn.execute('SELECT * FROM quizzes WHERE id = ?', (quiz_id,)).fetchone()
+    questions = conn.execute('SELECT * FROM questions WHERE quiz_id = ?', (quiz_id,)).fetchall()
+    
+    if not quiz or not questions:
+        conn.close()
+        flash('Quiz or questions not found!', 'danger')
+        return redirect(url_for('student_dashboard'))
+
     score = 0
     total_questions = len(questions)
-    
-    # मार्क्स मोजण्यासाठी लॉजिक
+
+    # Calculate score safely matching submitted options
     for q in questions:
-        selected_option = request.form.get(f"question_{q['id']}")
-        if selected_option and str(selected_option).strip() == str(q['correct_option']).strip():
+        selected_option = request.form.get(f'question_{q["id"]}')
+        if selected_option and selected_option.strip().upper() == str(q['correct_option']).strip().upper():
             score += 1
-            
-    # टक्केवारी आणि पास/फेअल स्टेटस
-    percentage = round((score / total_questions) * 100, 2) if total_questions > 0 else 0
-    pass_mark = quiz['pass_percentage'] if quiz and quiz['pass_percentage'] else 50
-    status = 'Passed' if percentage >= pass_mark else 'Failed'
-    
-    # आजची तारीख आणि वेळ
-    today_date = datetime.now().strftime('%d-%m-%Y %I:%M %p')
-    
-    # निकाल डेटाबेसमध्ये सेव्ह करा
-    conn.execute('''
-        INSERT INTO results (student_id, quiz_id, score, total_questions, percentage, status, date_taken)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-    ''', (session['user_id'], quiz_id, score, total_questions, percentage, status, today_date))
-    
-    conn.commit()
-    conn.close()
-    
-    flash(f'Quiz Submitted! Score: {score}/{total_questions} ({percentage}%) - Status: {status}', 'success')
-    return redirect('/student/dashboard')
+
+    percentage = round((score / total_questions) * 100, 2) if total_questions > 0 else 0.0
+    pass_percentage = quiz['pass_percentage']
+    status = 'Pass' if percentage >= pass_percentage else 'Fail'
+    date_today = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute('''
+            INSERT INTO results (student_id, quiz_id, score, total_questions, percentage, status, date_today)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        ''', (student_id, quiz_id, score, total_questions, percentage, status, date_today))
+        conn.commit()
+        flash('Quiz submitted successfully!', 'success')
+    except Exception as e:
+        conn.rollback()
+        flash('An error occurred while submitting the quiz.', 'danger')
+    finally:
+        conn.close()
+        
+    return redirect(url_for('student_dashboard'))
 
 if __name__ == '__main__':
     app.run(debug=True)
