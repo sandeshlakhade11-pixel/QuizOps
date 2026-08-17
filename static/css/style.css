@@ -366,3 +366,42 @@ body {
         font-size: 13px;
     }
 }
+/* --- MOBILE RESPONSIVE FIX --- */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    overflow-x: hidden;
+    padding: 10px !important;
+    margin: 0;
+}
+
+/* Enable horizontal scroll on tables without breaking the layout */
+table {
+    display: block !important;
+    width: 100% !important;
+    overflow-x: auto !important;
+    white-space: nowrap;
+}
+
+/* Force container boxes to fit mobile width */
+.container, 
+.card, 
+div[class*="portal"], 
+div[class*="dashboard"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+/* Scale certificate containers for small screens */
+@media (max-width: 768px) {
+    .certificate-container, 
+    img, 
+    div[class*="certificate"] {
+        max-width: 100% !important;
+        height: auto !important;
+    }
+}
