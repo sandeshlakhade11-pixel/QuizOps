@@ -500,3 +500,40 @@ table {
     width: 100% !important;
     min-width: 550px !important; /* Table won't crush, it will scroll */
 }
+/* Fix for Admin & Teacher Dashboard on Mobile */
+@media screen and (max-width: 768px) {
+    html, body {
+        width: 100% !important;
+        max-width: 100vw !important;
+        margin: 0 !important;
+        padding: 5px !important;
+        overflow-x: hidden !important;
+    }
+
+    .container, .main-content, .card, .navbar, .form-card {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        box-sizing: border-box !important;
+        display: block !important;
+    }
+
+    .row, .grid, .flex-container {
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+    }
+
+    .table-wrapper, div:has(> table) {
+        width: 100% !important;
+        overflow-x: auto !important;
+        display: block !important;
+    }
+
+    table {
+        width: 100% !important;
+        min-width: 500px !important;
+    }
+}
