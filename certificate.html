@@ -8,33 +8,87 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Pinyon+Script&family=Poppins:wght@400;500;600&display=swap');
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: #1e293b; font-family: 'Poppins', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        * { 
+            box-sizing: border-box !important; 
+            margin: 0; 
+            padding: 0; 
+        }
 
-        /* Certificate Frame */
+        body { 
+            background: #1e293b; 
+            font-family: 'Poppins', sans-serif; 
+            display: flex; 
+            flex-direction: column;
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            padding: 15px; 
+            width: 100%;
+        }
+
+        /* Top Action Buttons Wrapper */
+        .actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            width: 100%;
+            max-width: 900px;
+            margin-bottom: 15px;
+        }
+
+        .btn-print {
+            background: #16a34a;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .btn-back {
+            background: #475569;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Certificate Frame Responsive Fix */
         .cert-outer {
-            width: 900px;
+            width: 100%;
+            max-width: 900px;
             background: #fff;
-            padding: 25px;
-            border: 12px solid #0f172a;
+            padding: 15px;
+            border: 10px solid #0f172a;
             box-shadow: 0 20px 40px rgba(0,0,0,0.5);
             position: relative;
         }
 
         .cert-inner {
             border: 3px double #d97706;
-            padding: 40px;
+            padding: 30px 15px;
             text-align: center;
             background: #fffdfa;
             color: #1e293b;
             position: relative;
         }
 
-        /* Ribbon / Badge Header */
+        /* Header & Typography */
         .brand-header {
             font-family: 'Cinzel', serif;
-            font-size: 20px;
-            letter-spacing: 3px;
+            font-size: clamp(15px, 4vw, 20px);
+            letter-spacing: 2px;
             color: #0f172a;
             font-weight: 700;
             text-transform: uppercase;
@@ -42,37 +96,38 @@
 
         .cert-title {
             font-family: 'Cinzel', serif;
-            font-size: 38px;
+            font-size: clamp(22px, 5vw, 38px);
             font-weight: 800;
             color: #b45309;
-            margin: 15px 0 5px 0;
-            letter-spacing: 2px;
+            margin: 12px 0 5px 0;
+            letter-spacing: 1px;
         }
 
         .cert-subtitle {
-            font-size: 14px;
+            font-size: clamp(11px, 2.5vw, 14px);
             color: #64748b;
             text-transform: uppercase;
             letter-spacing: 2px;
-            margin-bottom: 25px;
+            margin-bottom: 15px;
         }
 
         .recipient-name {
             font-family: 'Pinyon Script', cursive;
-            font-size: 55px;
+            font-size: clamp(34px, 8vw, 55px);
             color: #0f172a;
-            margin: 10px 0;
+            margin: 5px 0 15px 0;
             border-bottom: 2px solid #cbd5e1;
             display: inline-block;
-            padding: 0 40px;
+            padding: 0 20px;
+            word-break: break-word;
         }
 
         .cert-text {
-            font-size: 15px;
+            font-size: clamp(13px, 3vw, 15px);
             color: #475569;
             line-height: 1.6;
             max-width: 650px;
-            margin: 15px auto;
+            margin: 10px auto;
         }
 
         .quiz-title {
@@ -85,68 +140,79 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
-            margin-top: 40px;
-            padding: 0 30px;
+            margin-top: 30px;
+            padding: 0 10px;
+            gap: 15px;
         }
 
-        .meta-box { text-align: left; font-size: 13px; color: #64748b; }
+        .meta-box { 
+            text-align: left; 
+            font-size: clamp(11px, 2.5vw, 13px); 
+            color: #64748b; 
+        }
+
         .meta-box b { color: #0f172a; }
 
         .seal-badge {
-            width: 80px;
-            height: 80px;
+            width: clamp(55px, 12vw, 80px);
+            height: clamp(55px, 12vw, 80px);
             background: radial-gradient(circle, #f59e0b, #b45309);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 32px;
+            font-size: clamp(22px, 5vw, 32px);
             box-shadow: 0 4px 10px rgba(180, 83, 9, 0.4);
-            border: 4px solid #fff;
+            border: 3px solid #fff;
+            flex-shrink: 0;
         }
 
         .signature-box { text-align: center; }
-        .sign-line { width: 160px; border-top: 2px solid #0f172a; margin-top: 40px; }
-        .sign-title { font-size: 12px; font-weight: 600; color: #64748b; margin-top: 5px; }
-
-        /* Action Buttons */
-        .actions {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            display: flex;
-            gap: 10px;
+        .sign-line { 
+            width: clamp(100px, 25vw, 160px); 
+            border-top: 2px solid #0f172a; 
+            margin-top: 30px; 
         }
-        .btn-print {
-            background: #16a34a;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        }
-        .btn-back {
-            background: #475569;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 14px;
+        .sign-title { 
+            font-size: clamp(10px, 2.2vw, 12px); 
+            font-weight: 600; 
+            color: #64748b; 
+            margin-top: 5px; 
         }
 
-        /* Print CSS for Clean PDF Output */
+        /* Mobile Screen Specific Tweaks */
+        @media (max-width: 550px) {
+            .cert-outer { padding: 8px; border-width: 6px; }
+            .cert-inner { padding: 20px 8px; }
+            .cert-footer {
+                flex-direction: column;
+                align-items: center;
+                gap: 20px;
+            }
+            .meta-box, .signature-box { text-align: center; }
+            .sign-line { margin-top: 10px; }
+        }
+
+        /* Clean Print / PDF Output */
         @media print {
-            body { background: white; padding: 0; }
-            .actions { display: none; }
-            .cert-outer { box-shadow: none; width: 100%; border-width: 8px; }
+            @page {
+                size: landscape;
+                margin: 0;
+            }
+            body { 
+                background: white !important; 
+                padding: 0 !important;
+                justify-content: center;
+            }
+            .actions { display: none !important; }
+            .cert-outer { 
+                box-shadow: none !important; 
+                width: 100% !important; 
+                max-width: 100% !important; 
+                border-width: 6px !important;
+                margin: 0 auto;
+            }
         }
     </style>
 </head>
