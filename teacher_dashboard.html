@@ -179,4 +179,82 @@
     </div>
 
 </body>
+</html>s<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>QuizOps - Teacher Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <div class="container">
+        <!-- NAVBAR -->
+        <div class="navbar" style="display:flex; justify-content: space-between; align-items:center; background:#1e293b; padding:15px; border-radius:12px; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
+            <div style="font-size:18px; font-weight:bold; color:#a855f7;">
+                <i class="fa-solid fa-chalkboard-user"></i> QuizOps Teacher Portal
+            </div>
+            <div style="display:flex; align-items:center; gap:10px;">
+                <span class="badge" style="background:rgba(168,85,247,0.2); color:#a855f7; padding:6px 12px; border-radius:20px;">
+                    <i class="fa-solid fa-user-tie"></i> Teacher: {{ session['username'] }}
+                </span>
+                <a href="/logout" class="btn-danger" style="background:#ef4444; color:#fff; padding:6px 12px; border-radius:6px; text-decoration:none;">
+                    <i class="fa-solid fa-right-from-bracket"></i> Logout
+                </a>
+            </div>
+        </div>
+
+        <!-- CREATE QUIZ LINK -->
+        <div class="glass-card" style="margin-bottom:24px; display:flex; justify-content: space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <h2 class="header-title" style="font-size:18px; color:#a855f7;">
+                <i class="fa-solid fa-folder-open"></i> Quizzes Created By You
+            </h2>
+            <a href="/create_quiz" class="btn-primary" style="background:#0284c7; color:#fff; padding:8px 16px; border-radius:6px; text-decoration:none; font-weight:bold;">
+                + Create New Quiz
+            </a>
+        </div>
+
+        <!-- QUIZZES TABLE -->
+        <div class="glass-card">
+            <div style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+                <table class="custom-table" style="width:100%; min-width:600px;">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Quiz Title</th>
+                            <th>Subject</th>
+                            <th>Duration</th>
+                            <th>Passing %</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for q in quizzes %}
+                        <tr>
+                            <td>#{{ q.id }}</td>
+                            <td><b>{{ q.title }}</b></td>
+                            <td>{{ q.subject }}</td>
+                            <td><i class="fa-regular fa-clock"></i> {{ q.duration }} Mins</td>
+                            <td>{{ q.pass_percentage }}%</td>
+                            <td>
+                                <a href="/add_questions/{{ q.id }}" style="background:#38bdf8; color:#0f172a; padding:6px 12px; border-radius:6px; text-decoration:none; font-weight:bold; font-size:13px; display:inline-block;">
+                                    <i class="fa-solid fa-list-check"></i> Manage Questions
+                                </a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" style="text-align:center; color:#94a3b8; padding:15px;">You haven't created any quizzes yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+</body>
 </html>
