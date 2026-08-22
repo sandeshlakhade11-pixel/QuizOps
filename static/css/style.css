@@ -336,3 +336,13 @@ html, body {
         margin-bottom: 8px;
     }
 }
+/* Table Scroll for Mobile */
+div[style*="overflow-x: auto"] {
+    width: 100%;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+}
+
+table.custom-table {
+    white-space: nowrap;
+}
