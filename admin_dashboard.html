@@ -6,82 +6,22 @@
     <title>QuizOps - Admin Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <style>
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--bg-card, #1e293b);
-            padding: 18px 24px;
-            border-radius: 12px;
-            border: 1px solid var(--border-color, #334155);
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--accent-blue, #38bdf8);
-        }
-        .user-info { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-        
-        .badge-admin {
-            background: rgba(56, 189, 248, 0.15);
-            color: var(--accent-blue, #38bdf8);
-            border: 1px solid var(--accent-blue, #38bdf8);
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        .btn-logout {
-            color: #ffffff;
-            background: #ef4444;
-            padding: 8px 16px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 13px;
-            transition: background 0.2s ease;
-        }
-        .btn-logout:hover { background: #dc2626; }
-
-        .btn-action-edit {
-            background: rgba(56, 189, 248, 0.15);
-            color: var(--accent-blue, #38bdf8);
-            border: 1px solid var(--accent-blue, #38bdf8);
-            padding: 6px 12px;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 12px;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        @media (max-width: 600px) {
-            .navbar { flex-direction: column; align-items: flex-start; padding: 16px; }
-            .user-info { width: 100%; justify-content: space-between; margin-top: 6px; }
-        }
-    </style>
 </head>
 <body>
 
     <div class="container">
         <!-- NAVBAR -->
-        <div class="navbar">
-            <div class="brand">
+        <div class="navbar" style="display:flex; justify-content: space-between; align-items:center; background:#1e293b; padding:15px; border-radius:12px; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
+            <div style="font-size:18px; font-weight:bold; color:#38bdf8;">
                 <i class="fa-solid fa-user-shield"></i> QuizOps Admin Portal
             </div>
-            <div class="user-info">
-                <span class="badge-admin"><i class="fa-solid fa-crown"></i> Admin: {{ session['username'] }}</span>
-                <a href="/logout" class="btn-logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+            <div style="display:flex; align-items:center; gap:10px;">
+                <span class="badge" style="background:rgba(56,189,248,0.2); color:#38bdf8; padding:6px 12px; border-radius:20px;">
+                    <i class="fa-solid fa-crown"></i> Admin: {{ session['username'] }}
+                </span>
+                <a href="/logout" class="btn-danger" style="background:#ef4444; color:#fff; padding:6px 12px; border-radius:6px; text-decoration:none;">
+                    <i class="fa-solid fa-right-from-bracket"></i> Logout
+                </a>
             </div>
         </div>
 
@@ -89,45 +29,42 @@
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                    <div class="alert alert-success">
-                        <i class="fa-solid fa-circle-check"></i>
-                        <span>{{ message }}</span>
+                    <div class="alert alert-{{ category }}" style="padding:10px; background:#10b981; color:#fff; border-radius:8px; margin-bottom:15px;">
+                        <i class="fa-solid fa-circle-info"></i> {{ message }}
                     </div>
                 {% endfor %}
             {% endif %}
         {% endwith %}
 
         <!-- ADD USER FORM -->
-        <div class="glass-card" style="margin-bottom: 24px;">
-            <h2 class="header-title" style="font-size: 18px; margin-bottom: 16px;">
+        <div class="glass-card" style="margin-bottom:24px;">
+            <h2 class="header-title" style="font-size:18px; margin-bottom:15px; color:#38bdf8;">
                 <i class="fa-solid fa-user-plus"></i> Add New User (Teacher / Student / Admin)
             </h2>
-            
-            <form action="/add_user" method="POST" style="display: flex; flex-direction: column; gap: 14px;">
-                <input type="text" name="username" class="form-control" placeholder="Username" required>
-                <input type="email" name="email" class="form-control" placeholder="Email Address" required>
-                <input type="password" name="password" class="form-control" placeholder="Password" required>
+            <form action="/admin/add_user" method="POST" style="display: flex; flex-direction: column; gap: 12px;">
+                <input type="text" name="username" class="form-control" placeholder="Username" required style="padding:10px; background:#0f172a; border:1px solid #334155; color:#fff; border-radius:6px;">
+                <input type="email" name="email" class="form-control" placeholder="Email Address" required style="padding:10px; background:#0f172a; border:1px solid #334155; color:#fff; border-radius:6px;">
+                <input type="password" name="password" class="form-control" placeholder="Password" required style="padding:10px; background:#0f172a; border:1px solid #334155; color:#fff; border-radius:6px;">
                 
-                <select name="role" class="form-control" required>
+                <select name="role" class="form-control" required style="padding:10px; background:#0f172a; border:1px solid #334155; color:#fff; border-radius:6px;">
                     <option value="Student">Student</option>
                     <option value="Teacher">Teacher</option>
                     <option value="Admin">Admin</option>
                 </select>
 
-                <button type="submit" class="btn-primary">
-                    <i class="fa-solid fa-plus"></i> Add User to System
+                <button type="submit" class="btn-primary" style="background:#0284c7; color:#fff; padding:10px; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">
+                    + Add User to System
                 </button>
             </form>
         </div>
 
         <!-- USER MANAGEMENT TABLE -->
-        <div class="glass-card" style="margin-bottom: 24px;">
-            <h2 class="header-title" style="font-size: 18px; margin-bottom: 16px;">
+        <div class="glass-card" style="margin-bottom:24px;">
+            <h2 class="header-title" style="font-size:18px; margin-bottom:15px; color:#38bdf8;">
                 <i class="fa-solid fa-users"></i> System User Management
             </h2>
-
-            <div class="table-wrapper">
-                <table class="custom-table">
+            <div style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+                <table class="custom-table" style="width:100%; min-width:600px;">
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -138,16 +75,15 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for user in users %}
+                        {% for u in users %}
                         <tr>
-                            <td>#{{ user.id }}</td>
-                            <td><b>{{ user.username }}</b></td>
-                            <td>{{ user.email }}</td>
-                            <td><span class="badge">{{ user.role }}</span></td>
-                            <td>
-                                <a href="/edit_user/{{ user.id }}" class="btn-action-edit">
-                                    <i class="fa-solid fa-pen"></i> Edit
-                                </a>
+                            <td>#{{ u.id }}</td>
+                            <td><b>{{ u.username }}</b></td>
+                            <td>{{ u.email }}</td>
+                            <td><span class="badge" style="background:rgba(56,189,248,0.1); color:#38bdf8; padding:4px 8px; border-radius:4px;">{{ u.role }}</span></td>
+                            <td style="display:flex; gap:6px;">
+                                <a href="/edit_user/{{ u.id }}" style="background:#0284c7; color:#fff; padding:5px 10px; border-radius:4px; text-decoration:none; font-size:12px;">Edit</a>
+                                <a href="/delete_user/{{ u.id }}" onclick="return confirm('Delete user?')" style="background:#ef4444; color:#fff; padding:5px 10px; border-radius:4px; text-decoration:none; font-size:12px;">Delete</a>
                             </td>
                         </tr>
                         {% endfor %}
@@ -156,14 +92,13 @@
             </div>
         </div>
 
-        <!-- ALL QUIZZES OVERVIEW -->
+        <!-- QUIZZES OVERVIEW -->
         <div class="glass-card">
-            <h2 class="header-title" style="font-size: 18px; margin-bottom: 16px;">
-                <i class="fa-solid fa-book-bookmark"></i> All Created Quizzes Overview
+            <h2 class="header-title" style="font-size:18px; margin-bottom:15px; color:#38bdf8;">
+                <i class="fa-solid fa-book"></i> All Created Quizzes Overview
             </h2>
-
-            <div class="table-wrapper">
-                <table class="custom-table">
+            <div style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+                <table class="custom-table" style="width:100%; min-width:600px;">
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -180,15 +115,13 @@
                             <td>#{{ q.id }}</td>
                             <td><b>{{ q.title }}</b></td>
                             <td>{{ q.subject }}</td>
-                            <td>{{ q.teacher_name if q.teacher_name else 'Admin' }}</td>
+                            <td>{{ q.created_by }}</td>
                             <td>{{ q.duration }} Mins</td>
-                            <td><b>{{ q.pass_percentage }}%</b></td>
+                            <td>{{ q.pass_percentage }}%</td>
                         </tr>
                         {% else %}
                         <tr>
-                            <td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 20px;">
-                                No quizzes created yet.
-                            </td>
+                            <td colspan="6" style="text-align:center; color:#94a3b8; padding:15px;">No quizzes created yet.</td>
                         </tr>
                         {% endfor %}
                     </tbody>
