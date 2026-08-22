@@ -8,9 +8,12 @@ from werkzeug.security import generate_password_hash, check_password_hash
 app = Flask(__name__)
 app.secret_key = 'quizops_secret_key_123'
 
-# Absolute path for Render deployment
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, 'quizops.db')
+# Render Persistent Storage Fix
+if os.environ.get('RENDER'):
+    DB_PATH = '/tmp/quizops.db'
+else:
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    DB_PATH = os.path.join(BASE_DIR, 'quizops.db')
 
 # ------------------------------------
 # DATABASE CONNECTION & INITIALIZATION
@@ -383,7 +386,6 @@ def submit_quiz(quiz_id):
     score = 0
     total_questions = len(questions)
 
-    # Calculate score safely matching submitted options
     for q in questions:
         selected_option = request.form.get(f'question_{q["id"]}')
         if selected_option and selected_option.strip().upper() == str(q['correct_option']).strip().upper():
