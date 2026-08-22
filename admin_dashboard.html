@@ -4,82 +4,70 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>QuizOps - Admin Dashboard</title>
-    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Main Style CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
-        .navbar { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            background: var(--bg-card, #1e293b); 
-            padding: 16px 20px; 
-            border-radius: 12px; 
-            margin-bottom: 24px; 
-            border: 1px solid var(--border-color, #334155); 
-            flex-wrap: wrap; 
-            gap: 12px; 
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-card, #1e293b);
+            padding: 18px 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color, #334155);
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 12px;
         }
-        .navbar h1 { 
-            font-size: 18px; 
-            color: var(--accent-blue, #38bdf8); 
-            display: flex; 
-            align-items: center; 
-            gap: 10px; 
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--accent-blue, #38bdf8);
         }
-        .user-info { 
-            display: flex; 
-            align-items: center; 
-            gap: 12px; 
-            flex-wrap: wrap; 
+        .user-info { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        
+        .badge-admin {
+            background: rgba(56, 189, 248, 0.15);
+            color: var(--accent-blue, #38bdf8);
+            border: 1px solid var(--accent-blue, #38bdf8);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
         }
-        .btn-logout { 
-            background: #ef4444; 
-            color: white; 
-            padding: 8px 16px; 
-            border-radius: 8px; 
-            text-decoration: none; 
-            font-size: 13px; 
-            font-weight: 600; 
+
+        .btn-logout {
+            color: #ffffff;
+            background: #ef4444;
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 13px;
             transition: background 0.2s ease;
         }
-        .btn-logout:hover { 
-            background: #dc2626; 
+        .btn-logout:hover { background: #dc2626; }
+
+        .btn-action-edit {
+            background: rgba(56, 189, 248, 0.15);
+            color: var(--accent-blue, #38bdf8);
+            border: 1px solid var(--accent-blue, #38bdf8);
+            padding: 6px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
         }
-        .form-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
-            gap: 14px; 
-            margin-bottom: 16px; 
-        }
-        .btn-edit { 
-            background: #0284c7; 
-            color: white; 
-            padding: 6px 12px; 
-            border-radius: 6px; 
-            text-decoration: none; 
-            font-size: 12px; 
-            font-weight: 600; 
-            margin-right: 4px; 
-            display: inline-block; 
-        }
-        .btn-edit:hover { background: #0369a1; }
-        .btn-delete { 
-            background: #ef4444; 
-            color: white; 
-            padding: 6px 12px; 
-            border-radius: 6px; 
-            text-decoration: none; 
-            font-size: 12px; 
-            font-weight: 600; 
-            display: inline-block; 
-        }
-        .btn-delete:hover { background: #dc2626; }
 
         @media (max-width: 600px) {
-            .navbar { flex-direction: column; align-items: flex-start; }
-            .user-info { width: 100%; justify-content: space-between; }
+            .navbar { flex-direction: column; align-items: flex-start; padding: 16px; }
+            .user-info { width: 100%; justify-content: space-between; margin-top: 6px; }
         }
     </style>
 </head>
@@ -88,9 +76,11 @@
     <div class="container">
         <!-- NAVBAR -->
         <div class="navbar">
-            <h1><i class="fa-solid fa-user-shield"></i> QuizOps Admin Portal</h1>
+            <div class="brand">
+                <i class="fa-solid fa-user-shield"></i> QuizOps Admin Portal
+            </div>
             <div class="user-info">
-                <span class="badge"><i class="fa-solid fa-crown"></i> Admin: {{ session.username }}</span>
+                <span class="badge-admin"><i class="fa-solid fa-crown"></i> Admin: {{ session['username'] }}</span>
                 <a href="/logout" class="btn-logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
             </div>
         </div>
@@ -99,57 +89,65 @@
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                    <div class="alert alert-danger"><i class="fa-solid fa-circle-check"></i> {{ message }}</div>
+                    <div class="alert alert-success">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span>{{ message }}</span>
+                    </div>
                 {% endfor %}
             {% endif %}
         {% endwith %}
 
-        <!-- ADD NEW USER CARD -->
+        <!-- ADD USER FORM -->
         <div class="glass-card" style="margin-bottom: 24px;">
-            <h2 class="header-title" style="font-size: 18px; margin-bottom: 16px;"><i class="fa-solid fa-user-plus"></i> Add New User (Teacher / Student / Admin)</h2>
-            <form action="/admin/add_user" method="POST">
-                <div class="form-grid">
-                    <input type="text" name="username" placeholder="Username" required>
-                    <input type="email" name="email" placeholder="Email Address" required>
-                    <input type="password" name="password" placeholder="Password" required>
-                    <select name="role" required>
-                        <option value="Student">Student</option>
-                        <option value="Teacher">Teacher</option>
-                        <option value="Admin">Admin</option>
-                    </select>
-                </div>
-                <button type="submit" class="btn-primary" style="width: 100%;">+ Add User to System</button>
+            <h2 class="header-title" style="font-size: 18px; margin-bottom: 16px;">
+                <i class="fa-solid fa-user-plus"></i> Add New User (Teacher / Student / Admin)
+            </h2>
+            
+            <form action="/add_user" method="POST" style="display: flex; flex-direction: column; gap: 14px;">
+                <input type="text" name="username" class="form-control" placeholder="Username" required>
+                <input type="email" name="email" class="form-control" placeholder="Email Address" required>
+                <input type="password" name="password" class="form-control" placeholder="Password" required>
+                
+                <select name="role" class="form-control" required>
+                    <option value="Student">Student</option>
+                    <option value="Teacher">Teacher</option>
+                    <option value="Admin">Admin</option>
+                </select>
+
+                <button type="submit" class="btn-primary">
+                    <i class="fa-solid fa-plus"></i> Add User to System
+                </button>
             </form>
         </div>
 
-        <!-- USERS TABLE CARD -->
+        <!-- USER MANAGEMENT TABLE -->
         <div class="glass-card" style="margin-bottom: 24px;">
-            <h2 class="header-title" style="font-size: 18px; margin-bottom: 16px;"><i class="fa-solid fa-users"></i> System User Management</h2>
+            <h2 class="header-title" style="font-size: 18px; margin-bottom: 16px;">
+                <i class="fa-solid fa-users"></i> System User Management
+            </h2>
+
             <div class="table-wrapper">
                 <table class="custom-table">
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>USERNAME</th>
-                            <th>EMAIL</th>
-                            <th>ROLE</th>
-                            <th>ACTIONS</th>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for u in users %}
+                        {% for user in users %}
                         <tr>
-                            <td>#{{ u['id'] }}</td>
-                            <td><b>{{ u['username'] }}</b></td>
-                            <td>{{ u['email'] }}</td>
-                            <td><span class="badge">{{ u['role'] }}</span></td>
+                            <td>#{{ user.id }}</td>
+                            <td><b>{{ user.username }}</b></td>
+                            <td>{{ user.email }}</td>
+                            <td><span class="badge">{{ user.role }}</span></td>
                             <td>
-                                <a href="/edit_user/{{ u['id'] }}" class="btn-edit"><i class="fa-solid fa-pen"></i> Edit</a>
-                                {% if u['username'] != 'admin' %}
-                                <a href="/delete_user/{{ u['id'] }}" class="btn-delete" onclick="return confirm('Delete this user?')"><i class="fa-solid fa-trash"></i> Delete</a>
-                                {% else %}
-                                <span style="color: var(--text-secondary); font-size: 12px;">(Active)</span>
-                                {% endif %}
+                                <a href="/edit_user/{{ user.id }}" class="btn-action-edit">
+                                    <i class="fa-solid fa-pen"></i> Edit
+                                </a>
                             </td>
                         </tr>
                         {% endfor %}
@@ -158,42 +156,46 @@
             </div>
         </div>
 
-        <!-- QUIZZES OVERVIEW CARD -->
+        <!-- ALL QUIZZES OVERVIEW -->
         <div class="glass-card">
-            <h2 class="header-title" style="font-size: 18px; margin-bottom: 16px;"><i class="fa-solid fa-book"></i> All Created Quizzes Overview</h2>
+            <h2 class="header-title" style="font-size: 18px; margin-bottom: 16px;">
+                <i class="fa-solid fa-book-bookmark"></i> All Created Quizzes Overview
+            </h2>
+
             <div class="table-wrapper">
                 <table class="custom-table">
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>QUIZ TITLE</th>
-                            <th>SUBJECT</th>
-                            <th>CREATED BY</th>
-                            <th>DURATION</th>
-                            <th>PASS %</th>
+                            <th>Quiz Title</th>
+                            <th>Subject</th>
+                            <th>Created By</th>
+                            <th>Duration</th>
+                            <th>Pass %</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% if quizzes %}
-                            {% for q in quizzes %}
-                            <tr>
-                                <td>#{{ q['id'] }}</td>
-                                <td><b>{{ q['title'] }}</b></td>
-                                <td>{{ q['subject'] }}</td>
-                                <td>{{ q['created_by'] }}</td>
-                                <td>{{ q['duration'] }} mins</td>
-                                <td>{{ q['pass_percentage'] }}%</td>
-                            </tr>
-                            {% endfor %}
+                        {% for q in quizzes %}
+                        <tr>
+                            <td>#{{ q.id }}</td>
+                            <td><b>{{ q.title }}</b></td>
+                            <td>{{ q.subject }}</td>
+                            <td>{{ q.teacher_name if q.teacher_name else 'Admin' }}</td>
+                            <td>{{ q.duration }} Mins</td>
+                            <td><b>{{ q.pass_percentage }}%</b></td>
+                        </tr>
                         {% else %}
-                            <tr>
-                                <td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 20px;">No quizzes created yet.</td>
-                            </tr>
-                        {% endif %}
+                        <tr>
+                            <td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 20px;">
+                                No quizzes created yet.
+                            </td>
+                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
         </div>
+
     </div>
 
 </body>
