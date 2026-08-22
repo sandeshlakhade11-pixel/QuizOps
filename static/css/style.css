@@ -537,3 +537,42 @@ table {
         min-width: 500px !important;
     }
 }
+/* ALL MOBILE RESPONSIVE FIXES */
+@media screen and (max-width: 768px) {
+    html, body {
+        width: 100% !important;
+        overflow-x: hidden !important;
+        margin: 0 !important;
+        padding: 5px !important;
+    }
+
+    /* Fix Layout Containers */
+    .container, .dashboard-container, .card, .actions, .cert-outer {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    /* Fix Tables Horizontally */
+    .table-responsive, table {
+        display: block !important;
+        width: 100% !important;
+        overflow-x: auto !important;
+        white-space: nowrap !important;
+    }
+
+    /* Certificate Responsiveness */
+    .cert-outer {
+        padding: 8px !important;
+    }
+    .cert-inner {
+        padding: 15px 5px !important;
+    }
+    .cert-footer {
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 15px !important;
+    }
+}
